@@ -1,12 +1,11 @@
-const { Pool, Client } = require('pg')
+const mysql = require('mysql')
 
-const pool = new Pool({
-  user: 'mbaghdasaryan',
-  host: 'database-1.csxbhznoei2x.us-east-1.rds.amazonaws.com',
-  database: 'themachineDB',
-  password: 'minas2020',
-  port: 5432,
-})
+const envConfig = process.env.SQL_CONFIG;
+
+const sqlConfig = JSON.parse(envConfig || '{"host":"localhost", "database":"corvid", "user":"", "password":""}');
+
+//console.log('Working with sql config: ' + JSON.stringify(sqlConfig))
+const connection = mysql.createConnection(sqlConfig);
 
 exports.select = (table, clause = '', sortClause = '', skip = 0, limit = 1) =>
   query(
@@ -20,14 +19,14 @@ exports.insert = (table, item) =>
 
 exports.update = (table, item) =>
   query(
-    `UPDATE ${table} SET ? WHERE _id = ${pool.escape(item._id)}`,
+    `UPDATE ${table} SET ? WHERE _id = ${connection.escape(item._id)}`,
     item,
     () => item
   )
 
 exports.deleteOne = (table, itemId) =>
   query(
-    `DELETE FROM ${table} WHERE _id = ${pool.escape(itemId)}`,
+    `DELETE FROM ${table} WHERE _id = ${connection.escape(itemId)}`,
     {},
     result => result.affectedRows
   )
