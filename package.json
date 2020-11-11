@@ -1,7 +1,7 @@
 {
-  "name": "mysql-adapter-node",
+  "name": "postgresql-adapter-node",
   "version": "1.0.0",
-  "description": "Wix Data basic MySQL adapter for Node.js",
+  "description": "Wix Data basic PostgreSQL adapter for Node.js",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -10,13 +10,13 @@
     "deploy": "gcloud app deploy ./app.yaml"
   },
   "keywords": [
-    "mysql"
+    "postgresql"
   ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.4",
-    "mysql": "^2.16.0",
+    "pg": "^8.4.2",
     "uuid": "^3.4.0"
   },
   "devDependencies": {

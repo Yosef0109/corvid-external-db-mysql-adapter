@@ -1,5 +1,13 @@
 const BadRequestError = require('../../model/error/bad-request')
-const mysql = require('mysql')
+const { Pool, Client } = require('pg')
+
+const pool = new Pool({
+  user: 'mbaghdasaryan',
+  host: 'database-1.csxbhznoei2x.us-east-1.rds.amazonaws.com',
+  database: 'themachineDB',
+  password: 'minas2020',
+  port: 5432,
+})
 
 const EMPTY = ''
 
@@ -32,19 +40,19 @@ const parseInternal = filter => {
       return value ? `NOT (${value})` : value
     }
     case '$ne':
-      return `${filter.fieldName} <> ${mysql.escape(mapValue(filter.value))}`
+      return `${filter.fieldName} <> ${pool.escape(mapValue(filter.value))}`
     case '$lt':
-      return `${filter.fieldName} < ${mysql.escape(mapValue(filter.value))}`
+      return `${filter.fieldName} < ${pool.escape(mapValue(filter.value))}`
     case '$lte':
-      return `${filter.fieldName} <= ${mysql.escape(mapValue(filter.value))}`
+      return `${filter.fieldName} <= ${pool.escape(mapValue(filter.value))}`
     case '$gt':
-      return `${filter.fieldName} > ${mysql.escape(mapValue(filter.value))}`
+      return `${filter.fieldName} > ${pool.escape(mapValue(filter.value))}`
     case '$gte':
-      return `${filter.fieldName} >= ${mysql.escape(mapValue(filter.value))}`
+      return `${filter.fieldName} >= ${pool.escape(mapValue(filter.value))}`
     case '$hasSome': {
       const list = filter.value
         .map(mapValue)
-        .map(date => mysql.escape(date, null, null))
+        .map(date => pool.escape(date, null, null))
         .join(', ')
       return list ? `${filter.fieldName} IN (${list})` : EMPTY
     }
@@ -52,19 +60,19 @@ const parseInternal = filter => {
       if (!filter.value || (filter.value && filter.value.length === 0)) {
         return '';
       }
-      return `${filter.fieldName} LIKE ${mysql.escape(`%${filter.value}%`)}`
+      return `${filter.fieldName} LIKE ${pool.escape(`%${filter.value}%`)}`
     case '$urlized': {
       const list = filter.value.map(s => s.toLowerCase()).join('[- ]')
       return list ? `LOWER(${filter.fieldName}) RLIKE '${list}'` : EMPTY
     }
     case '$startsWith':
-      return `${filter.fieldName} LIKE ${mysql.escape(`${filter.value}%`)}`
+      return `${filter.fieldName} LIKE ${pool.escape(`${filter.value}%`)}`
     case '$endsWith':
-      return `${filter.fieldName} LIKE ${mysql.escape(`%${filter.value}`)}`
+      return `${filter.fieldName} LIKE ${pool.escape(`%${filter.value}`)}`
     case '$eq': {
       return filter.value === null || filter.value === undefined
         ? `${filter.fieldName} IS NULL`
-        : `${filter.fieldName} = ${mysql.escape(mapValue(filter.value))}`
+        : `${filter.fieldName} = ${pool.escape(mapValue(filter.value))}`
     }
     default:
       throw new BadRequestError(
